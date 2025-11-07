@@ -1,0 +1,64 @@
+export const MOCK_DB = {
+  users: [
+    { id: 'user-admin-1', tenantId: 'tenant-1', nome: 'Alice', cognome: 'Admin', email: 'alice.admin@consulting.com', ruolo: 'Administrator', tariffaOraria: 150, skills: ['System Architecture', 'Team Leadership'], foto: 'https://placehold.co/100x100/E2E8F0/4A5568?text=AA' },
+    { id: 'user-pm-1', tenantId: 'tenant-1', nome: 'Bob', cognome: 'Manager', email: 'bob.manager@consulting.com', ruolo: 'Project Manager', tariffaOraria: 120, skills: ['Agile', 'Scrum', 'Budgeting'], foto: 'https://placehold.co/100x100/E2E8F0/4A5568?text=BM' },
+    { id: 'user-consultant-1', tenantId: 'tenant-1', nome: 'Charlie', cognome: 'Consultant', email: 'charlie.consultant@consulting.com', ruolo: 'Consultant', tariffaOraria: 90, skills: ['React', 'Node.js', 'Firebase'], foto: 'https://placehold.co/100x100/E2E8F0/4A5568?text=CC' },
+    { id: 'user-consultant-2', tenantId: 'tenant-1', nome: 'Diana', cognome: 'Developer', email: 'diana.dev@consulting.com', ruolo: 'Consultant', tariffaOraria: 85, skills: ['Cybersecurity', 'GDPR', 'Penetration Testing'], foto: 'https://placehold.co/100x100/E2E8F0/4A5568?text=DD' },
+    { id: 'user-client-1', tenantId: 'tenant-1', nome: 'Eve', cognome: 'Executive', email: 'eve.executive@clientcorp.com', ruolo: 'Cliente', aziendaAssociataId: 'company-client-1', foto: 'https://placehold.co/100x100/E2E8F0/4A5568?text=EE' },
+    { id: 'user-supplier-1', tenantId: 'tenant-1', nome: 'Frank', cognome: 'Fornitore', email: 'frank.fornitore@supply.it', ruolo: 'Fornitore', aziendaAssociataId: 'company-supplier-1', foto: 'https://placehold.co/100x100/E2E8F0/4A5568?text=FF' },
+    { id: 'user-originator-1', tenantId: 'tenant-1', nome: 'Grace', cognome: 'Growth', email: 'grace.growth@partner.net', ruolo: 'Originator', foto: 'https://placehold.co/100x100/E2E8F0/4A5568?text=GG' },
+  ],
+  aziende: [
+    { id: 'company-client-1', tenantId: 'tenant-1', ragioneSociale: 'ClientCorp S.p.A.', tipo: 'Cliente', pIva: '12345678901', pec: 'clientcorp@pec.it', settore: 'Manifatturiero', accountManagerId: 'user-pm-1', teamMemberIds: ['user-consultant-1', 'user-consultant-2'], clientUserIds: ['user-client-1'], tags: ['innovazione', 'produzione', 'b2b'], analisiFinanziaria: { scoring: 85, areeRischio: ['Liquidità sotto la media di settore'] }, sviluppoStrategico: { internazionalizzazione: { attivo: true, mercati: ['Germania', 'Francia'] }, finanzaAgevolata: { invitaliaAttuali: ['Resto al Sud'], invitaliaOpportunita: ['Smart&Start'] } } },
+    { id: 'company-client-2', tenantId: 'tenant-1', ragioneSociale: 'Innovatech S.r.l.', tipo: 'Cliente', pIva: '09876543210', pec: 'innovatech@pec.it', settore: 'Information Technology', accountManagerId: 'user-pm-1', teamMemberIds: ['user-consultant-1'], clientUserIds: [], tags: ['startup', 'saas', 'ai'], originatorId: 'user-originator-1', analisiFinanziaria: { scoring: 92, areeRischio: [] }, sviluppoStrategico: { internazionalizzazione: { attivo: false, interesse: true, mercatiInteresse: 'USA' }, finanzaAgevolata: { invitaliaAttuali: [], invitaliaOpportunita: ['Fondo Impresa Femminile'] } } },
+    { id: 'company-supplier-1', tenantId: 'tenant-1', ragioneSociale: 'SupplyChain Solutions', tipo: 'Fornitore', pIva: '11223344556', pec: 'supplychain@pec.it', settore: 'Logistica', statoQualifica: 'Qualificato', punteggioQualifica: 95, scoringReputazioneAI: 5, prodottiServiziAI: ['Logistica integrata', 'Spedizioni internazionali'], accordoQuadro: { status: 'Firmato' }, tags: ['logistica', 'just-in-time', 'qualificato'] },
+    { id: 'company-supplier-2', tenantId: 'tenant-2', ragioneSociale: 'Old Supplier Inc.', tipo: 'Fornitore', pIva: '66554433221', pec: 'oldsupplier@pec.it', settore: 'Hardware', statoQualifica: 'In Valutazione', punteggioQualifica: 60, scoringReputazioneAI: 3, prodottiServiziAI: [], accordoQuadro: { status: 'Bozza' }, tags: [] },
+  ],
+  contatti: [
+    { id: 'contact-1', tenantId: 'tenant-1', nome: 'Mario', cognome: 'Rossi', posizione: 'CEO', aziendaId: 'company-client-1', email: [{type: 'Lavoro', value: 'mario.rossi@clientcorp.com'}], stadio: 'Cliente', fonte: 'Referral', tags: ['decision-maker'] },
+    { id: 'contact-2', tenantId: 'tenant-1', nome: 'Laura', cognome: 'Bianchi', posizione: 'CTO', aziendaId: 'company-client-2', email: [{type: 'Lavoro', value: 'laura.bianchi@innovatech.it'}], stadio: 'Cliente', fonte: 'Web', tags: ['influencer-tecnico', 'ai'], originatorId: 'user-originator-1' },
+    { id: 'contact-3', tenantId: 'tenant-1', nome: 'Paolo', cognome: 'Verdi', posizione: 'Sales Manager', aziendaId: 'company-supplier-1', email: [{type: 'Lavoro', value: 'paolo.verdi@supply.it'}], stadio: 'Partner', fonte: 'Fiera', tags: [] },
+  ],
+  progetti: [
+    { id: 'project-1', tenantId: 'tenant-1', nome: 'CRM Implementation', clienteId: 'company-client-1', projectManagerId: 'user-pm-1', teamAssegnatoIds: ['user-consultant-1', 'user-consultant-2'], budget: 50000, stato: 'In Corso', tags: ['crm', 'salesforce', 'implementazione'], fornitoriCoinvolti: [{ fornitoreId: 'company-supplier-1', descrizioneLavoro: 'Consulenza Logistica', costoPrevisto: 5000 }] },
+    { id: 'project-2', tenantId: 'tenant-1', nome: 'AI Model Development', clienteId: 'company-client-2', projectManagerId: 'user-pm-1', teamAssegnatoIds: ['user-consultant-1'], budget: 75000, stato: 'Pianificazione', tags: ['ai', 'machine-learning', 'data-science'] },
+    { id: 'project-3', tenantId: 'tenant-2', nome: 'Legacy System Migration', clienteId: 'company-client-2', projectManagerId: 'user-pm-1', teamAssegnatoIds: ['user-consultant-1'], budget: 120000, stato: 'Completato', tags: [] },
+  ],
+  deals: [
+    { id: 'deal-1', tenantId: 'tenant-1', nome: 'Nuovo Sito Web per ClientCorp', clienteId: 'company-client-1', valore: 25000, probabilita: 75, fase: 'In Negoziazione' },
+    { id: 'deal-2', tenantId: 'tenant-1', nome: 'Consulenza GDPR per Innovatech', clienteId: 'company-client-2', valore: 15000, probabilita: 50, fase: 'Proposta Inviata' },
+    { id: 'deal-3', tenantId: 'tenant-1', nome: 'Contratto di Manutenzione', clienteId: 'company-client-1', valore: 30000, probabilita: 90, fase: 'Chiuso Vinto' },
+  ],
+  attivita: [
+    { id: 'task-1', tenantId: 'tenant-1', titolo: 'Preparare kick-off meeting Progetto CRM', tipo: 'task', utenteId: 'user-pm-1', progettoId: 'project-1', scadenza: new Date(new Date().setDate(new Date().getDate() + 3)).toISOString(), completata: false },
+    { id: 'task-2', tenantId: 'tenant-1', titolo: 'Sviluppare componente Auth', tipo: 'task', utenteId: 'user-consultant-1', progettoId: 'project-1', scadenza: new Date(new Date().setDate(new Date().getDate() + 8)).toISOString(), completata: false },
+    { id: 'task-3', tenantId: 'tenant-1', titolo: 'Analisi requisiti AI Model', tipo: 'task', utenteId: 'user-consultant-1', progettoId: 'project-2', scadenza: new Date(new Date().setDate(new Date().getDate() + 20)).toISOString(), completata: false },
+    { id: 'task-4', tenantId: 'tenant-1', titolo: 'Chiamata follow-up con Mario Rossi', tipo: 'chiamata', utenteId: 'user-pm-1', contattoId: 'contact-1', scadenza: new Date(new Date().setDate(new Date().getDate() - 2)).toISOString(), completata: true },
+    { id: 'task-5', tenantId: 'tenant-1', titolo: 'Firmare NDA con Innovatech', tipo: 'task', utenteId: 'user-admin-1', aziendaId: 'company-client-2', scadenza: new Date(new Date().setDate(new Date().getDate() - 1)).toISOString(), completata: false },
+  ],
+  messaggi: [
+      { id: 'msg-1', chatId: 'chat-pm1-c1', autoreId: 'user-pm-1', testo: 'Ciao Charlie, come procede lo sviluppo?', timestamp: new Date(new Date().setHours(new Date().getHours() - 2)).toISOString(), reazioni: { '👍': ['user-consultant-1'] } },
+      { id: 'msg-2', chatId: 'chat-pm1-c1', autoreId: 'user-consultant-1', testo: 'Ciao Bob! Tutto bene, sto finalizzando il componente di autenticazione. Dovrei finire entro domani.', timestamp: new Date(new Date().setHours(new Date().getHours() - 1)).toISOString(), reazioni: {} },
+      { id: 'msg-3', chatId: 'chat-proj1', autoreId: 'user-pm-1', testo: 'Team, ricordatevi il meeting di domani alle 10 per il kick-off!', timestamp: new Date().toISOString(), reazioni: { '👍': ['user-consultant-1', 'user-consultant-2'] } },
+  ],
+  chats: [
+      { id: 'chat-pm1-c1', tipo: '1-a-1', membriIds: ['user-pm-1', 'user-consultant-1'], nome: 'Charlie Consultant' },
+      { id: 'chat-proj1', tipo: 'gruppo', membriIds: ['user-pm-1', 'user-consultant-1', 'user-consultant-2'], nome: 'Progetto CRM Implementation' },
+  ],
+  timesheet: [
+    { id: 'ts-1', tenantId: 'tenant-1', utenteId: 'user-consultant-1', progettoId: 'project-1', data: new Date().toISOString(), ore: 4, categoria: 'Sviluppo', note: 'Lavoro sul componente Auth' },
+    { id: 'ts-2', tenantId: 'tenant-1', utenteId: 'user-pm-1', progettoId: 'project-1', data: new Date().toISOString(), ore: 2, categoria: 'Meeting Cliente', note: 'Kick-off call' },
+  ],
+  news: [
+    { id: 'news-1', tenantId: 'tenant-1', testo: 'Nuovo cliente acquisito: Innovatech S.r.l.', timestamp: new Date().toISOString(), type: 'nuovo_cliente_acquisito' },
+    { id: 'news-2', tenantId: 'tenant-1', testo: 'Progetto Legacy System Migration completato con successo!', timestamp: new Date(new Date().setDate(new Date().getDate() - 1)).toISOString(), type: 'progetto_completato' },
+  ],
+  sandboxNotes: [
+      {id: 'note-1', userId: 'user-admin-1', content: 'Idea per nuovo servizio: Consulenza DORA per banche.'},
+      {id: 'note-2', userId: 'user-pm-1', content: 'Ricordarsi di verificare le milestone del progetto CRM prima della fine del mese.'},
+  ],
+  events: [
+      {id: 'evt-1', title: 'Kick-off Progetto CRM', date: new Date().toISOString(), utenteId: 'user-pm-1'},
+      {id: 'evt-2', title: 'Scadenza Task Auth', date: new Date(new Date().setDate(new Date().getDate() + 8)).toISOString(), utenteId: 'user-consultant-1'},
+  ]
+};
