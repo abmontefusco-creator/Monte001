@@ -1,11 +1,19 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Header } from "../components/Header";
 import { useTranslation } from "../contexts/LanguageContext";
 import { AuthContext, AuthProvider, useAuth } from "../contexts/AuthContext"
 import { Calendar, ChevronDown, Search, Bell, MessageSquare, Plus, Star, Users, Briefcase, Building, DollarSign, FileText, Settings, LogOut, User, Clock, Calendar as CalendarIcon, AlertTriangle, ListTodo, BrainCircuit, Newspaper, CheckCircle, XCircle, MoreVertical, Paperclip, Send, Smile, Phone, Mail, Link, MapPin, Trash2, Edit, Filter, GripVertical, Download, Eye, Share2, Shield, Play, Square } from 'lucide-react';
 import { MOCK_DB } from "../mock/mockDb" // Assicurati che questo path punti al file giusto
 import { Card } from "./Card"
-// --------------------------------------------------------------------------------
+import { Modal } from "./Modal";
+import { fetchTenantData } from "../services/api";
+//import ChatComponent from './Scrivania/ChatComponent.jsx';
+import { ChatComponent } from './Scrivania/ChatComponent.jsx';
+import { TimesheetComponent } from './Scrivania/TimesheetComponent.jsx';
+
+
+// --------------------cd server
+// ------------------------------------------------------------
 // Pagina: Scrivania (Workspace)
 // Hub centrale per la produttività personale e di team.
 // --------------------------------------------------------------------------------
@@ -15,8 +23,23 @@ export const Scrivania = () => {
 
     const MyTasksComponent = () => {
         const { user } = useAuth();
-        const myTasks = MOCK_DB.attivita.filter(a => a.utenteId === user.id && !a.completata);
+        const [myTasks, setTasks] = useState([]);
+        //const myTasks = MOCK_DB.attivita.filter(a => a.utenteId === user.id && !a.completata);
         const now = new Date();
+        
+        useEffect(() => {
+            const loadTasks = async () => {
+                try {
+                    const res = await fetch(`http://localhost:5000/api/attivita?utenteId=${user._id}`);
+                    const data = await res.json();
+                    setTasks(data);
+                } catch (err) {
+                    console.error("Errore fetch attivita:", err);
+                }
+            };
+
+            loadTasks();
+        }, [user._id]);
 
         const categorizeTask = (task) => {
             const dueDate = new Date(task.scadenza);
@@ -67,7 +90,7 @@ export const Scrivania = () => {
                         <div key={category}>
                             <h4 className={`font-bold mb-2 ${category === 'URGENTE' ? 'text-red-500' : category === 'DA_FARE' ? 'text-orange-500' : 'text-gray-500'}`}>{t(category.toLowerCase())}</h4>
                             <div className="space-y-2">
-                                {categorizedTasks[category].map(task => <TaskItem key={task.id} task={task} category={category} />)}
+                                {categorizedTasks[category].map(task => <TaskItem key={task._id} task={task} category={category} />)}
                             </div>
                         </div>
                     ))}
@@ -100,127 +123,9 @@ export const Scrivania = () => {
         );
     };
     
-    const ChatComponent = () => {
-        const { user } = useAuth();
-        const myChats = MOCK_DB.chats.filter(c => c.membriIds.includes(user.id));
-        const [selectedChat, setSelectedChat] = useState(myChats[0]);
-        const [messages, setMessages] = useState(MOCK_DB.messaggi.filter(m => m.chatId === selectedChat?.id));
-        const [newMessage, setNewMessage] = useState('');
-
-        const handleSend = () => {
-            if (newMessage.trim() === '') return;
-            const msg = {
-                id: `msg-${Date.now()}`, chatId: selectedChat.id, autoreId: user.id,
-                testo: newMessage, timestamp: new Date().toISOString(), reazioni: {}
-            };
-            setMessages(prev => [...prev, msg]);
-            setNewMessage('');
-        };
-
-        const getChatPartner = (chat) => {
-            if (chat.tipo === 'gruppo') return { nome: chat.nome, foto: 'https://placehold.co/40x40/E2E8F0/4A5568?text=G' };
-            const otherUserId = chat.membriIds.find(id => id !== user.id);
-            return MOCK_DB.users.find(u => u.id === otherUserId);
-        };
-
-        return (
-            <Card className="h-full flex flex-col">
-                <h3 className="text-xl font-semibold text-gray-800 dark:text-gray-200 mb-4">{t('chat_messaggi')}</h3>
-                <div className="flex-grow flex border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden">
-                    <div className="w-1/3 border-r border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 overflow-y-auto">
-                        {myChats.map(chat => {
-                            const partner = getChatPartner(chat);
-                            const lastMessage = MOCK_DB.messaggi.filter(m => m.chatId === chat.id).sort((a,b) => new Date(b.timestamp) - new Date(a.timestamp))[0];
-                            return (
-                                <div key={chat.id} onClick={() => { setSelectedChat(chat); setMessages(MOCK_DB.messaggi.filter(m => m.chatId === chat.id)); }} className={`p-4 cursor-pointer flex items-center ${selectedChat?.id === chat.id ? 'bg-blue-100 dark:bg-blue-900' : 'hover:bg-gray-100 dark:hover:bg-gray-700'}`}>
-                                    <img src={partner.foto} alt="avatar" className="w-10 h-10 rounded-full mr-3" />
-                                    <div className="flex-grow overflow-hidden">
-                                        <p className="font-semibold truncate">{partner.nome} {partner.cognome || ''}</p>
-                                        <p className="text-sm text-gray-500 truncate">{lastMessage?.testo}</p>
-                                    </div>
-                                </div>
-                            );
-                        })}
-                    </div>
-                    <div className="w-2/3 flex flex-col">
-                        {selectedChat ? (
-                            <>
-                                <div className="p-4 border-b border-gray-200 dark:border-gray-700 flex items-center">
-                                    <img src={getChatPartner(selectedChat).foto} alt="avatar" className="w-10 h-10 rounded-full mr-3" />
-                                    <h4 className="font-semibold">{getChatPartner(selectedChat).nome} {getChatPartner(selectedChat).cognome || ''}</h4>
-                                </div>
-                                <div className="flex-grow p-4 space-y-4 overflow-y-auto bg-white dark:bg-gray-900">
-                                    {messages.map(msg => {
-                                        const author = MOCK_DB.users.find(u => u.id === msg.autoreId);
-                                        const isMe = author.id === user.id;
-                                        return (
-                                            <div key={msg.id} className={`flex items-end gap-2 ${isMe ? 'justify-end' : 'justify-start'}`}>
-                                                {!isMe && <img src={author.foto} alt="author" className="w-8 h-8 rounded-full" />}
-                                                <div className={`max-w-xs md:max-w-md p-3 rounded-lg ${isMe ? 'bg-blue-500 text-white' : 'bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-gray-100'}`}>
-                                                    <p>{msg.testo}</p>
-                                                    <p className={`text-xs mt-1 ${isMe ? 'text-blue-200' : 'text-gray-500'}`}>{new Date(msg.timestamp).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</p>
-                                                </div>
-                                            </div>
-                                        );
-                                    })}
-                                </div>
-                                <div className="p-4 border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 flex items-center">
-                                    <button className="p-2 text-gray-500 hover:text-blue-500"><Smile /></button>
-                                    <button className="p-2 text-gray-500 hover:text-blue-500"><Paperclip /></button>
-                                    <input type="text" value={newMessage} onChange={(e) => setNewMessage(e.target.value)} onKeyPress={(e) => e.key === 'Enter' && handleSend()} placeholder="Scrivi un messaggio..." className="flex-grow bg-transparent focus:outline-none mx-2" />
-                                    <button onClick={handleSend} className="p-2 text-white bg-blue-500 rounded-full hover:bg-blue-600"><Send /></button>
-                                </div>
-                            </>
-                        ) : <div className="flex-grow flex items-center justify-center text-gray-500">Seleziona una chat per iniziare a messaggiare</div>}
-                    </div>
-                </div>
-            </Card>
-        );
-    };
-
-    const TimesheetComponent = () => {
-        const { user } = useAuth();
-        const [isTiming, setIsTiming] = useState(false);
-        const userProjects = MOCK_DB.progetti.filter(p => p.teamAssegnatoIds.includes(user.id) || p.projectManagerId === user.id);
-        const userTimesheet = MOCK_DB.timesheet.filter(t => t.utenteId === user.id);
-        const dailyHours = userTimesheet.filter(t => new Date(t.data).toDateString() === new Date().toDateString()).reduce((sum, t) => sum + t.ore, 0);
-        const weeklyHours = userTimesheet.reduce((sum, t) => sum + t.ore, 0); // Semplificato per demo
-
-        return (
-            <Card className="h-full">
-                <h3 className="text-xl font-semibold text-gray-800 dark:text-gray-200 mb-4">{t('timesheet')}</h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div className="space-y-4 p-4 border rounded-lg">
-                        <button onClick={() => setIsTiming(!isTiming)} className={`w-full flex items-center justify-center gap-2 px-4 py-2 text-white rounded-lg ${isTiming ? 'bg-red-500 hover:bg-red-600' : 'bg-green-500 hover:bg-green-600'}`}>
-                            {isTiming ? <><Square size={16} /> {t('ferma_timer')}</> : <><Play size={16} /> {t('avvia_timer')}</>}
-                        </button>
-                        <select className="w-full p-2 border rounded dark:bg-gray-700 dark:border-gray-600" defaultValue="">
-                            <option value="" disabled>{t('progetto')}</option>
-                            {userProjects.map(p => <option key={p.id} value={p.id}>{p.nome}</option>)}
-                        </select>
-                        <select className="w-full p-2 border rounded dark:bg-gray-700 dark:border-gray-600" defaultValue="">
-                            <option value="" disabled>{t('categoria_attivita')}</option>
-                            <option>Attività Commerciale</option>
-                            <option>Incontro Cliente</option>
-                            <option>Stesura Documenti</option>
-                            <option>Analisi di Commessa</option>
-                        </select>
-                        <input type="number" placeholder={t('ore')} className="w-full p-2 border rounded dark:bg-gray-700 dark:border-gray-600" />
-                        <textarea placeholder={t('note')} className="w-full p-2 border rounded dark:bg-gray-700 dark:border-gray-600" rows="3"></textarea>
-                        <button className="w-full px-4 py-2 bg-blue-500 text-white rounded">{t('registra_ore')}</button>
-                    </div>
-                    <div className="space-y-4">
-                        <StatCard icon={<Clock size={24} />} title={t('ore_giornaliere')} value={dailyHours} />
-                        <StatCard icon={<CalendarIcon size={24} />} title={t('ore_settimanali')} value={weeklyHours} />
-                    </div>
-                </div>
-            </Card>
-        );
-    };
-
     const SandboxComponent = () => {
         const { user } = useAuth();
-        const [note, setNote] = useState(MOCK_DB.sandboxNotes.find(n => n.userId === user.id)?.content || '');
+        const [note, setNote] = useState(MOCK_DB.sandboxNotes.find(n => n.userId === user._id)?.content || '');
         return (
             <Card className="h-full flex flex-col">
                 <h3 className="text-xl font-semibold text-gray-800 dark:text-gray-200 mb-4">{t('pensatoio')}</h3>
@@ -235,13 +140,13 @@ export const Scrivania = () => {
 
     const AiAssistantComponent = () => {
         const { user } = useAuth();
-        const overdueTasks = MOCK_DB.attivita.filter(a => a.utenteId === user.id && !a.completata && new Date(a.scadenza) < new Date());
+        const overdueTasks = MOCK_DB.attivita.filter(a => a.utenteId === user._id && !a.completata && new Date(a.scadenza) < new Date());
         return (
             <Card>
                 <h3 className="text-xl font-semibold text-gray-800 dark:text-gray-200 mb-4">{t('suggerimenti_ai')}</h3>
                 <div className="space-y-3">
                     {overdueTasks.map(task => (
-                        <div key={task.id} className="flex items-start gap-3 p-3 bg-yellow-50 dark:bg-yellow-900/50 rounded-lg">
+                        <div key={task._id} className="flex items-start gap-3 p-3 bg-yellow-50 dark:bg-yellow-900/50 rounded-lg">
                             <AlertTriangle className="text-yellow-500 mt-1" />
                             <p>L'attività "<span className="font-semibold">{task.titolo}</span>" è scaduta. Considera di riprogrammarla o completarla.</p>
                         </div>
@@ -260,7 +165,7 @@ export const Scrivania = () => {
             <h3 className="text-xl font-semibold text-gray-800 dark:text-gray-200 mb-4">{t('canale_news')}</h3>
             <div className="space-y-4">
                 {MOCK_DB.news.map(item => (
-                    <div key={item.id} className="flex items-center gap-4">
+                    <div key={item._id} className="flex items-center gap-4">
                         <div className={`p-2 rounded-full ${item.type === 'nuovo_cliente_acquisito' ? 'bg-green-100 text-green-600' : 'bg-blue-100 text-blue-600'}`}>
                            {item.type === 'nuovo_cliente_acquisito' ? <Star size={20} /> : <CheckCircle size={20} />}
                         </div>

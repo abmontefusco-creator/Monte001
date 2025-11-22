@@ -16,7 +16,7 @@ export const Sidebar = ({ activeView, onNavigate }) => {
     const { user } = useAuth();
     //const allUsers = MOCK_DB.users; // <--- definito qui
 
-    // 🔄 Inizializza lo stato per gli utenti
+// 🔄 Inizializza lo stato per gli utenti
 const [allUsers, setAllUsers] = useState([]);
 
 // 🔁 Al montaggio, carica i dati dal backend Express
@@ -24,7 +24,7 @@ useEffect(() => {
   fetch("http://localhost:5000/api/users")
     .then(res => res.json())
     .then(data => {
-      console.log("✅ Dati ricevuti:", data); // 👈 aggiungi questa riga
+      //console.log("✅ Dati ricevuti:", data); // 👈 aggiungi questa riga
       setAllUsers(data);
     })
     .catch(err => console.error("Errore nel caricamento utenti:", err));
@@ -78,11 +78,11 @@ useEffect(() => {
             <label htmlFor="user-switcher" className="text-sm font-medium text-gray-600 dark:text-gray-300 block mb-1">Cambia Utente:</label>
             <select 
                 id="user-switcher"
-                value={user.id} 
+                value={user._id} 
                 onChange={(e) => loginAs(e.target.value)}
                 className="w-full p-2 bg-gray-100 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md text-sm"
             >
-                {allUsers.map(u => <option key={u.id} value={u.id}>{u.nome} {u.cognome} ({u.ruolo})</option>)}
+                {allUsers.map(u => <option key={u._id} value={u._id}>{u.nome} {u.cognome} ({u.ruolo})</option>)}
             </select>
         </div>
         <button className="w-full flex items-center justify-center space-x-2 px-4 py-2 rounded-lg text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">

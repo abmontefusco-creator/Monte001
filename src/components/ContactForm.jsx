@@ -1,4 +1,4 @@
-import React from "react";
+//import React from "react";
 import { useTranslation } from "../contexts/LanguageContext";
 import { AuthContext, AuthProvider, useAuth } from "../contexts/AuthContext"
 import { AnagraficaPage } from "./Anagrafica";
@@ -7,6 +7,8 @@ import { DocumentManager } from "./DocumentManager";
 import { Card } from "./Card"
 import { Calendar, ChevronDown, Search, Bell, MessageSquare, Plus, Star, Users, Briefcase, Building, DollarSign, FileText, Settings, LogOut, User, Clock, Calendar as CalendarIcon, AlertTriangle, ListTodo, BrainCircuit, Newspaper, CheckCircle, XCircle, MoreVertical, Paperclip, Send, Smile, Phone, Mail, Link, MapPin, Trash2, Edit, Filter, GripVertical, Download, Eye, Share2, Shield, Play, Square } from 'lucide-react';
 import { MOCK_DB } from "../mock/mockDb" // Assicurati che questo path punti al file giusto
+import { useEffect, useState } from "react";
+import { fetchTenantData } from "../services/api";
 
 // --------------------------------------------------------------------------------
 // Componente Form: ContactForm
@@ -14,6 +16,7 @@ import { MOCK_DB } from "../mock/mockDb" // Assicurati che questo path punti al 
 export const ContactForm = ({ initialData, onSave, onClose }) => {
     const { t } = useTranslation();
     const [formData, setFormData] = useState(initialData);
+
 
     useEffect(() => {
         setFormData(initialData);
@@ -44,6 +47,17 @@ export const ContactForm = ({ initialData, onSave, onClose }) => {
 // --------------------------------------------------------------------------------
 export const ContactsPage = () => {
     const { t } = useTranslation();
+    const [contatti, setContatti] = useState([]);
+
+    useEffect(() => {
+        fetch("http://localhost:5000/api/contatti")
+        .then(res => res.json())
+        .then(data => {
+            console.log("✅ Dati contatti:", data); // 👈 aggiungi questa riga
+            setContatti(data);
+        })
+        .catch(err => console.error("Errore fetch contatti:", err));
+    }, []);
 
     const getCompanyName = (id) => MOCK_DB.aziende.find(c => c.id === id)?.ragioneSociale || 'N/A';
 
@@ -77,8 +91,8 @@ export const ContactsPage = () => {
                     <p><strong>Fonte:</strong> {contact.fonte}</p>
                 </div>
             </div>
-            <ActivityTimeline relatedId={contact.id} relatedType="contatto" />
-            <DocumentManager parentId={contact.id} parentType="contatti" />
+            <ActivityTimeline relatedId={contact._id} relatedType="contatto" />
+            <DocumentManager parentId={contact._id} parentType="contatti" />
         </Card>
     );
 
@@ -86,7 +100,7 @@ export const ContactsPage = () => {
         <AnagraficaPage
             pageTitle={t('contatti')}
             itemType="contatti"
-            data={MOCK_DB.contatti}
+            data={contatti}
             renderListItem={renderListItem}
             renderDetailPane={renderDetailPane}
             FormComponent={ContactForm}
