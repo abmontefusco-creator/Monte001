@@ -4,7 +4,8 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "start": "concurrently \"npm run server\" \"npm run client\"",
+    "start": "node server/server.js",
+    "start:dev": "concurrently \"npm run server\" \"npm run client\"",
     "server": "node server/server.js",
     "client": "vite",
     "dev": "vite",
@@ -35,7 +36,6 @@
     "vite": "^7.1.7"
   },
   "description": "This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.",
-  "main": "eslint.config.js",
   "keywords": [],
   "author": "",
   "license": "ISC"
